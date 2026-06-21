@@ -11,7 +11,7 @@ import se.lexicon.subscriptionapi.service.SubscriptionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customers/{customerId}/subscriptions")
+@RequestMapping("/api/v1/customers/{customerId}/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionController {
 

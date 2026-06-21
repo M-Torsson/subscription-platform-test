@@ -13,7 +13,7 @@ import se.lexicon.subscriptionapi.service.PlanService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/plans")
+@RequestMapping("/api/v1/plans")
 @RequiredArgsConstructor
 public class PlanController {
 
