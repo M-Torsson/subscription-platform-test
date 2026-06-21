@@ -1,233 +1,212 @@
 ![Lexicon Logo](https://lexicongruppen.se/media/wi5hphtd/lexicon-logo.svg)
 
-# ProjectTest – Subscription Platform
-
-**Project Type:** Backend REST API (Spring Boot + JPA)
+# Subscription Platform
 
 ## Overview
 
-You will extend and complete an existing backend project for a **Subscription Management Platform**.  
-The system allows service providers to offer subscription plans, while customers can browse plans and manage their
-subscriptions.
+Subscription Platform is a backend REST API built with Spring Boot and JPA for managing operators, subscription plans, and customer subscriptions.
 
-Your implementation must follow the functional and technical requirements described below.
+The application allows administrators to manage operators and plans, while customers can browse available plans, subscribe to services, change subscriptions, and cancel subscriptions according to defined business rules.
 
 ---
 
-## Scenario
+## Features
 
-You are building a backend for a **subscription management platform** used by multiple service providers (**operators**).
+### Authentication & Security
 
-Operators offer subscription plans in two categories:
+* JWT Authentication
+* Spring Security authorization
+* Role-based access control
+* Admin and Customer roles
+* Redis token blacklist support
 
-### Internet Services
+### Operator Management
 
-- Fiber 50
-- Fiber 100
-- Fiber 300
+* Manage operators
+* Retrieve operator information
 
-### Mobile Services
+### Plan Management
 
-- Mobile Basic
-- Mobile Plus
-- Mobile Unlimited
+* Create plans
+* Update plans
+* Delete plans
+* View all plans
+* View active plans only
+* Filter plans by service type
+* View plans by operator
 
-Each operator maintains its own catalog of plans.
+### Subscription Management
 
-Each plan contains:
-
-- Name
-- Price
-- Service type (Internet or Mobile)
-- Optional data limit
-- Active/Inactive status
-
-Customers can:
-
-- Register and manage their profile
-- Browse operators and active plans
-- Subscribe to plans
-- Change plans
-- Cancel subscriptions
+* Subscribe to a plan
+* View customer subscriptions
+* Change subscription plans
+* Cancel subscriptions
+* Track subscription status and cancellation date
 
 ---
 
 ## Business Rules
 
-- A customer may have **at most one active subscription per service type**:
-    - One Internet subscription
-    - One Mobile subscription
+The system enforces the following rules:
 
-- A subscription is created with status **ACTIVE**
-- Cancelled subscriptions must store a cancellation date
-- Only **active plans** are visible and subscribable
-- Plan changes are allowed **only within the same operator and same service type**
-
-Violations of these rules must result in meaningful custom exceptions.
-
----
-
-## Actors
-
-| Actor        | Responsibilities                          |
-|--------------|-------------------------------------------|
-| **Admin**    | Create and manage operators and plans     |
-| **Customer** | Browse plans and manage own subscriptions |
+* A customer can have only one active Internet subscription.
+* A customer can have only one active Mobile subscription.
+* Only active plans can be subscribed to.
+* New subscriptions are created with ACTIVE status.
+* Cancelled subscriptions store a cancellation date.
+* Plan changes are only allowed within the same operator.
+* Plan changes are only allowed within the same service type.
+* Invalid operations generate custom business exceptions.
 
 ---
 
-### Domain Analysis
+## Domain Model
 
-```mermaid
-erDiagram
-    CUSTOMER ||--o{ SUBSCRIPTION: has
-    PLAN ||--o{ SUBSCRIPTION: used_by
-    OPERATOR ||--o{ PLAN: offers
-    CUSTOMER ||--|| CUSTOMER_DETAIL: has
-```
-## Entity Requirements
+Main entities:
 
-- Define JPA relationships and ownership
-- Add required fields to `Plan` and `Subscription`
-- Use enums where applicable (service type, subscription status)
-- Enable auditing (`createdAt`, `updatedAt`)
-- Add constraints (unique, not null, length, etc.)
+* Customer
+* CustomerDetail
+* Operator
+* Plan
+* Subscription
+
+Relationships are implemented using JPA and Hibernate.
 
 ---
 
-## Service Layer
+## Technical Stack
 
-- Implement services for all domain operations
-- Use `@Transactional` on write operations
-- Enforce business rules inside services
-- Throw custom exceptions for invalid operations
-
----
-
-## DTOs, Mapping & Validation
-
-- Use DTOs (records recommended)
-- Do **not** expose entities in controllers
-- Use validation annotations (`@NotNull`, `@NotBlank`, etc.)
-- Convert between Entity and DTO using MapStruct or manual mappers
-
----
-
-## REST API & Security
-
-- Controllers for **Plan** and **Subscription**
-- Role-based access:
-  - ADMIN → manage operators & plans
-  - CUSTOMER → manage own subscriptions
-- Return correct HTTP status codes
-- Global exception handling
-- (Optional) Swagger annotations
-
-### Required API Functionality
-
-Expose endpoints that support the following operations.
-
-#### Plan API
-
-**ADMIN must be able to:**
-- Create a plan
-- Update a plan
-- Delete a plan
-- View all plans (active and inactive)
-
-**CUSTOMER must be able to:**
-- View all active plans
-- View active plans by service type (Internet / Mobile)
-- View plans belonging to a specific operator
+* Java 25
+* Spring Boot 4
+* Spring Data JPA
+* Spring Security
+* JWT Authentication
+* MySQL 8
+* Redis
+* MapStruct
+* Lombok
+* Swagger / OpenAPI
+* Maven
+* Docker & Docker Compose
 
 ---
 
-#### Subscription API
+## Validation & Error Handling
 
-**CUSTOMER must be able to:**
-- Subscribe to a plan
-- View their own subscriptions
-- Change subscription plan
-- Cancel subscription
+* DTO-based API design
+* Bean Validation annotations
+* Global Exception Handling
+* Custom Exceptions:
 
-The API must enforce the business rules defined in this document (for example: one active subscription per service type).
+  * ResourceNotFoundException
+  * BusinessRuleException
 
 ---
-
 
 ## Seed Data
 
-Initialize:
+### Users
 
-- At least 2 operators
-- Multiple plans per operator
-- Both active and inactive plans
+#### Admin User
 
----
+Email:
 
-## (Optional) Testing
+[admin@example.com](mailto:admin@example.com)
 
-- Unit tests for repositories
-- Unit tests for services
-- Controller tests
+Password:
 
----
+password
 
-## ✅ Submission Checklist
+#### Regular User
 
-- GitHub repository link
-- `pom.xml` contains required dependencies
-- Entities and relationships implemented
-- Services, transactions, and exceptions
-- DTOs and validation
-- Swagger UI accessible
-- README with run instructions
-- Seed data included
+Email:
 
----
+[user@example.com](mailto:user@example.com)
 
-## Technical Stack & Requirements
+Password:
 
-* **Java 25**
-* **Spring Boot 4.x**
-* **Spring Data JPA** (Hibernate)
-* **Spring Security** (JWT Authentication)
-* **MySQL 8.0** (Database)
-* **Redis** (Token Blacklisting)
-* **MapStruct** (Object Mapping)
-* **Lombok** (Boilerplate reduction)
-* **Swagger/OpenAPI 3** (API Documentation)
-* **Maven** (Build Tool)
-* **Docker & Docker Compose** (Infrastructure)
+password
 
-### Prerequisites
+### Operators
 
-Before running the application, ensure you have the following installed:
+* Telia
+* Telenor
 
-* [JDK 25](https://www.oracle.com/java/technologies/downloads/)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+### Plans
+
+Multiple active and inactive plans are automatically created during application startup.
 
 ---
 
-## Getting Started
+## Running the Project
 
-### 1. Infrastructure Setup (Database & Redis)
-
-The project uses Docker Compose to manage the MySQL database and Redis server.
-
-Make sure **Docker Desktop is running**, then open a terminal in the **project root directory** (where `docker-compose.yml` is located) and run:
+### Start Infrastructure
 
 ```bash
 docker-compose up -d
 ```
 
-### 2. Run the Application
+### Run Application
 
-Navigate to the `subscription-api` directory and run `SubscriptionApiApplication.java`
+Navigate to:
 
+```bash
+subscription-api
+```
 
-### 3. API Documentation
+Run:
 
-Once the app is running, access the Swagger UI at:
-`http://localhost:8080/swagger-ui.html`
+```bash
+./mvnw spring-boot:run
+```
 
+or start:
+
+```text
+SubscriptionApiApplication
+```
+
+from IntelliJ IDEA.
+
+---
+
+## API Documentation & Testing
+
+Swagger UI is available at:
+
+http://localhost:8080/swagger-ui.html
+
+All API endpoints were manually tested using both Swagger UI and Postman.
+
+The following areas were verified successfully:
+
+* Authentication and authorization
+* Plan management operations
+* Subscription management operations
+* Business rule enforcement
+* Request validation
+* Exception handling
+* Role-based access control
+
+---
+
+## Project Structure
+
+* Controllers
+* Services
+* Repositories
+* DTOs
+* Mappers
+* Security
+* Exception Handling
+* Configuration
+
+The project follows a layered architecture and separates domain entities from API contracts using DTOs.
+
+---
+
+## Author
+
+Muthana Fouad
+
+Lexicon Java Backend Development Program
